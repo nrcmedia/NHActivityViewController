@@ -23,10 +23,10 @@
 // THE SOFTWARE.
 //
 
-#import "OWActivityView.h"
+#import "OWActivityListView.h"
 #import "OWActivityViewController.h"
 
-@implementation OWActivityView
+@implementation OWActivityListView
 
 - (id)initWithFrame:(CGRect)frame activities:(NSArray *)activities
 {

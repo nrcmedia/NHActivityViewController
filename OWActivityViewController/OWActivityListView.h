@@ -26,7 +26,7 @@
 #import <UIKit/UIKit.h>
 #import "OWActivity.h"
 
-@interface OWActivityView : UIView <UIScrollViewDelegate> {
+@interface OWActivityListView : UIView <UIScrollViewDelegate> {
     UIPageControl *_pageControl;
 }
 
