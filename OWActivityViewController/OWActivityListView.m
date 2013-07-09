@@ -143,16 +143,13 @@
 
 - (void)cancelButtonPressed
 {
-    [_activityViewController dismissViewControllerAnimated:YES completion:nil];
+    [_activityViewController didFinishActivity:nil completed:NO];
 }
 
 - (void)buttonPressed:(UIButton *)button
 {
     OWActivity *activity = [_activities objectAtIndex:button.tag];
-    activity.activityViewController = _activityViewController;
-    if (activity.actionBlock) {
-        activity.actionBlock(activity, _activityViewController);
-    }
+    [_activityViewController performActivity:activity];
 }
 
 #pragma mark -
