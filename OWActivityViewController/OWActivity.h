@@ -35,7 +35,7 @@ typedef void (^OWActivityActionBlock)(OWActivity *activity, OWActivityViewContro
 @property (strong, readonly, nonatomic) NSString *title;
 @property (strong, readonly, nonatomic) UIImage *image;
 @property (copy, nonatomic) OWActivityActionBlock actionBlock;
-@property (strong, nonatomic) OWActivityViewController *activityViewController;
+@property (weak, nonatomic) OWActivityViewController* delegate;
 @property (strong, nonatomic) NSDictionary *userInfo;
 
 - (id)initWithTitle:(NSString *)title image:(UIImage *)image actionBlock:(OWActivityActionBlock)actionBlock;
