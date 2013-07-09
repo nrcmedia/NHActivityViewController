@@ -32,6 +32,7 @@
 @property (nonatomic,strong) UIViewController* performingViewController;
 @property (nonatomic,strong) NSArray* activities;
 @property (nonatomic,strong) NSArray* items;
+@property (nonatomic,strong) NSArray* rawItemCache;
 @end
 
 @implementation OWActivityViewController
@@ -59,11 +60,52 @@
     return self.listViewController.contentSizeForViewInPopover;
 }
 
+- (NSArray*)placeHolderItemsForActivityType:(NSString*)activityType {
+    NSMutableArray* placeholderItems = [NSMutableArray arrayWithCapacity:[self.items count]];
+    for (id item in self.items) {
+        if ([item respondsToSelector:@selector(activityViewControllerPlaceholderItem:)]) {
+            id placeholderItem = [item activityViewControllerPlaceholderItem:(id)self];
+            if (placeholderItem != nil) {
+                [placeholderItems addObject:placeholderItem];
+            }
+        } else {
+            [placeholderItems addObject:item];
+        }
+    }
+    return placeholderItems;
+}
+
+- (NSArray*)itemsForActivityType:(NSString*)activityType {
+    NSMutableArray* rawItems = [NSMutableArray arrayWithCapacity:[self.items count]];
+    for (id item in self.items) {
+        if ([item respondsToSelector:@selector(activityViewController:itemForActivityType:)]) {
+            id rawItem = [item activityViewController:(id)self itemForActivityType:activityType];
+            if (rawItem != nil) {
+                [rawItems addObject:rawItem];
+            }
+        } else {
+            [rawItems addObject:item];
+        }
+    }
+    return rawItems;
+}
+
+- (NSArray*)performableActivities {
+    NSMutableArray* performableActivities = [[NSMutableArray alloc] initWithCapacity:[self.activities count]];
+    for (OWActivity* activity in self.activities) {
+        NSArray* items = [self placeHolderItemsForActivityType:[activity activityType]];
+        if ([activity canPerformWithActivityItems:items]) {
+            [performableActivities addObject:activity];
+        }
+    }
+    return performableActivities;
+}
+
 - (OWActivityListViewController*)listViewController {
     if (_listViewController == nil) {
         _listViewController = [[OWActivityListViewController alloc] init];
         _listViewController.activityViewController = self;
-        _listViewController.activities = self.activities;
+        _listViewController.activities = [self performableActivities];
     }
     return _listViewController;
 }
@@ -80,6 +122,8 @@
 - (void)performActivity:(OWActivity *)activity {
     __weak OWActivityViewController* weakSelf = self;
     [self dismissListViewControllerWithCompletion:^(BOOL finished) {
+        NSArray* items = [self itemsForActivityType:[activity activityType]];
+        [activity prepareWithActivityItems:items];
         [weakSelf showActivity:activity];
     }];
 }
