@@ -27,30 +27,52 @@
 #import "OWActivityViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 
+@interface OWSaveToCameraRollActivity()
+@property (nonatomic,strong) UIImage* image;
+@end
+
 @implementation OWSaveToCameraRollActivity
 
-- (id)init
-{
-    self = [super initWithTitle:NSLocalizedStringFromTable(@"activity.CameraRoll.title", @"OWActivityViewController", @"Save to Camera Roll")
-                          image:[UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Photos"]
-                    actionBlock:nil];
+- (NSString *)activityType {
+    return OWActivityTypeSaveToCameraRoll;
+}
+
+- (NSString *)activityTitle {
+    return NSLocalizedStringFromTable(@"activity.CameraRoll.title", @"OWActivityViewController", @"Save to Camera Roll");
+}
+
+- (UIImage *)activityImage {
+    return [UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Photos"];
+}
+
+- (BOOL)canPerformWithActivityItems:(NSArray*)activityItems {
+    for (id item in activityItems) {
+        if ([item isKindOfClass:[UIImage class]])
+        {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+    for (id item in activityItems) {
+        if([item isKindOfClass:[UIImage class]]) {
+            self.image = item;
+        }
+    }
+}
+
+- (void)performActivity {
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    __weak OWSaveToCameraRollActivity* weakSelf = self;
+    [library writeImageToSavedPhotosAlbum:self.image.CGImage
+                              orientation:(ALAssetOrientation)self.image.imageOrientation
+                          completionBlock:^(NSURL *assetURL, NSError *error) {
+                              BOOL completed = error == nil;
+                              [weakSelf activityDidFinish:completed];
+                          }];
     
-    if (!self)
-        return nil;
-    
-    __typeof(&*self) __weak weakSelf = self;
-    self.actionBlock = ^(OWActivity *activity, OWActivityViewController *activityViewController) {
-        [activityViewController dismissViewControllerAnimated:YES completion:nil];
-        NSDictionary *userInfo = weakSelf.userInfo ? weakSelf.userInfo : activityViewController.userInfo;
-        UIImage *image = [userInfo objectForKey:@"image"];
-        
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeImageToSavedPhotosAlbum:image.CGImage
-                                  orientation:(ALAssetOrientation)image.imageOrientation
-                              completionBlock:nil];
-    };
-    
-    return self;
 }
 
 @end

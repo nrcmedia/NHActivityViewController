@@ -26,27 +26,58 @@
 #import "OWTwitterActivity.h"
 #import "OWActivityViewController.h"
 #import <Twitter/Twitter.h>
+#import <Social/Social.h>
+
+@interface OWTwitterActivity()
+@property (nonatomic,strong) UIImage* image;
+@property (nonatomic,strong) NSString* text;
+@property (nonatomic,strong) NSURL* URL;
+@end
 
 @implementation OWTwitterActivity
 
-- (id)init
-{
-    self = [super initWithTitle:NSLocalizedStringFromTable(@"activity.Twitter.title", @"OWActivityViewController", @"Twitter")
-                          image:[UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Twitter"]
-                    actionBlock:nil];
-    
-    if (!self)
-        return nil;
-    return self;
+- (NSString *)activityType {
+    return OWActivityTypePostToTwitter;
 }
 
+- (NSString *)activityTitle {
+    return NSLocalizedStringFromTable(@"activity.Twitter.title", @"OWActivityViewController", @"Twitter");
+}
+
+- (UIImage *)activityImage {
+    return [UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Twitter"];
+}
+
+- (BOOL)canPerformWithActivityItems:(NSArray*)activityItems {
+    for (id item in activityItems) {
+        if (  [item isKindOfClass:[NSString class]]
+            || [item isKindOfClass:[UIImage class]]
+            || [item isKindOfClass:[NSURL class]]
+            )
+        {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+    for (id item in activityItems) {
+        if ([item isKindOfClass:[NSString class]]) {
+            self.text = item;
+        } else if([item isKindOfClass:[UIImage class]]) {
+            self.image = item;
+        } else if([item isKindOfClass:[NSURL class]]) {
+            self.URL = item;
+        }
+    }
+}
 
 - (UIViewController *)activityPerformingViewController {
     id twitterViewComposer = nil;
-    NSDictionary* userInfo = self.userInfo;
     __weak OWTwitterActivity* weakSelf = self;
-    if( NSClassFromString (@"UIActivityViewController") ) {
-            // ios 6
+    if(NSClassFromString(@"SLComposeViewController")) {
+        // ios 6
         SLComposeViewController* composeVC = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
         if (!twitterViewComposer) {
             return nil;
@@ -66,15 +97,12 @@
     }
     
     if (twitterViewComposer) {
-        NSString* text  = [userInfo objectForKey:@"text"];
-        NSURL* url = [userInfo objectForKey:@"url"];
-        UIImage* image = [userInfo objectForKey:@"image"];
-        if (text)
-            [twitterViewComposer setInitialText:text];
-        if (image)
-            [twitterViewComposer addImage:image];
-        if (url)
-            [twitterViewComposer addURL:url];
+        if (self.text)
+            [twitterViewComposer setInitialText:self.text];
+        if (self.image)
+            [twitterViewComposer addImage:self.image];
+        if (self.URL)
+            [twitterViewComposer addURL:self.URL];
     }
     return twitterViewComposer;
 }

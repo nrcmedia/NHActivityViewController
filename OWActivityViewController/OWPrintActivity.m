@@ -26,48 +26,74 @@
 #import "OWPrintActivity.h"
 #import "OWActivityViewController.h"
 
+@interface OWPrintActivity()
+@property (nonatomic,strong) UIImage* image;
+@property (nonatomic,strong) NSString* text;
+@end
+
 @implementation OWPrintActivity
 
-- (id)init
-{
-    self = [super initWithTitle:NSLocalizedStringFromTable(@"activity.Print.title", @"OWActivityViewController", @"Print")
-                          image:[UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Print"]
-                    actionBlock:nil];
-    
-    if (!self)
-        return nil;
-    
-    __typeof(&*self) __weak weakSelf = self;
-    self.actionBlock = ^(OWActivity *activity, OWActivityViewController *activityViewController) {
-        NSDictionary *userInfo = weakSelf.userInfo ? weakSelf.userInfo : activityViewController.userInfo;
-        [activityViewController dismissViewControllerAnimated:YES completion:^{
-            UIPrintInteractionController *pc = [UIPrintInteractionController sharedPrintController];
-            
-            UIPrintInfo *printInfo = [UIPrintInfo printInfo];
-            printInfo.outputType = UIPrintInfoOutputGeneral;
-            printInfo.jobName = [userInfo objectForKey:@"text"];
-            pc.printInfo = printInfo;
-            
-            pc.printingItem = [userInfo objectForKey:@"image"];
-            
-            void (^completionHandler)(UIPrintInteractionController *, BOOL, NSError *) =
-            ^(UIPrintInteractionController *printController, BOOL completed, NSError *error) {
-                if (!completed && error) {
-                    UIAlertView *av = [[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"activity.Print.error.title", @"OWActivityViewController", @"Error.")
-                                                                 message:[NSString stringWithFormat:NSLocalizedStringFromTable(@"activity.Print.error.message", @"OWActivityViewController", @"An error occured while printing: %@"), error]
-                                                                delegate:nil
-                                                       cancelButtonTitle:@"OK"
-                                                       otherButtonTitles:nil, nil];
-                    
-                    [av show];
-                }
-            };
-            
-            [pc presentAnimated:YES completionHandler:completionHandler];
-        }];
-    };
-    
-    return self;
+- (NSString *)activityType {
+    return OWActivityTypePrint;
 }
+
+- (NSString *)activityTitle {
+    return NSLocalizedStringFromTable(@"activity.Print.title", @"OWActivityViewController", @"Print");
+}
+
+- (UIImage *)activityImage {
+    return [UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Print"];
+}
+
+- (BOOL)canPerformWithActivityItems:(NSArray*)activityItems {
+    if (![UIPrintInteractionController isPrintingAvailable]) {
+        return NO;
+    }
+    for (id item in activityItems) {
+        if (  [item isKindOfClass:[NSString class]]
+            || [item isKindOfClass:[UIImage class]]
+            || [item isKindOfClass:[NSURL class]]
+            )
+        {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+    for (id item in activityItems) {
+        if ([item isKindOfClass:[NSString class]]) {
+            self.text = item;
+        } else if([item isKindOfClass:[UIImage class]]) {
+            self.image = item;
+        }
+    }
+}
+
+- (void)performActivity {
+    UIPrintInteractionController *pc = [UIPrintInteractionController sharedPrintController];
+    UIPrintInfo *printInfo = [UIPrintInfo printInfo];
+    printInfo.outputType = UIPrintInfoOutputGeneral;
+    printInfo.jobName = self.text;
+    pc.printInfo = printInfo;
+    pc.printingItem = self.image;
+    void (^completionHandler)(UIPrintInteractionController *, BOOL, NSError *) =
+    ^(UIPrintInteractionController *printController, BOOL completed, NSError *error) {
+        if (!completed && error) {
+            //TODO: make this nicer
+            UIAlertView *av = [[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"activity.Print.error.title", @"OWActivityViewController", @"Error.")
+                                                         message:[NSString stringWithFormat:NSLocalizedStringFromTable(@"activity.Print.error.message", @"OWActivityViewController", @"An error occured while printing: %@"), error]
+                                                        delegate:nil
+                                               cancelButtonTitle:@"OK"
+                                               otherButtonTitles:nil, nil];
+            
+            [av show];
+        }
+        [self activityDidFinish:completed];
+    };
+    [pc presentAnimated:YES completionHandler:completionHandler];
+}
+
 
 @end

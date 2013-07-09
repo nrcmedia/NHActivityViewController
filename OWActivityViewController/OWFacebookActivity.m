@@ -24,50 +24,78 @@
 //
 
 #import "OWFacebookActivity.h"
-#import "OWActivityViewController.h"
+#import <Social/Social.h>
+
+@interface OWFacebookActivity()
+@property (nonatomic,strong) UIImage* image;
+@property (nonatomic,strong) NSString* text;
+@property (nonatomic,strong) NSURL* URL;
+@end
 
 @implementation OWFacebookActivity
 
-- (id)init
-{
-    self = [super initWithTitle:NSLocalizedStringFromTable(@"activity.Facebook.title", @"OWActivityViewController", @"Facebook")
-                          image:[UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Facebook"]
-                    actionBlock:nil];
-    if (!self)
-        return nil;
-    
-    __typeof(&*self) __weak weakSelf = self;
-    self.actionBlock = ^(OWActivity *activity, OWActivityViewController *activityViewController) {
-        UIViewController *presenter = activityViewController.presentingController;
-        NSDictionary *userInfo = weakSelf.userInfo ? weakSelf.userInfo : activityViewController.userInfo;
-        [activityViewController dismissViewControllerAnimated:YES completion:^{
-            [weakSelf shareFromViewController:presenter
-                                     text:[userInfo objectForKey:@"text"]
-                                      url:[userInfo objectForKey:@"url"]
-                                    image:[userInfo objectForKey:@"image"]];
-        }];
-    };
-    
-    return self;
+- (NSString *)activityType {
+    return OWActivityTypePostToFacebook;
 }
 
-- (void)shareFromViewController:(UIViewController *)viewController text:(NSString *)text url:(NSURL *)url image:(UIImage *)image
+- (NSString *)activityTitle {
+    return NSLocalizedStringFromTable(@"activity.Facebook.title", @"OWActivityViewController", @"Facebook");
+}
+
+- (UIImage *)activityImage {
+    return [UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Facebook"];
+}
+
+- (BOOL)canPerformWithActivityItems:(NSArray*)activityItems {
+    if (!NSClassFromString(@"SLComposeViewController")) {
+        return NO;
+    }
+    for (id item in activityItems) {
+        if (  [item isKindOfClass:[NSString class]]
+            || [item isKindOfClass:[UIImage class]]
+            || [item isKindOfClass:[NSURL class]]
+            )
+        {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+    for (id item in activityItems) {
+        if ([item isKindOfClass:[NSString class]]) {
+            self.text = item;
+        } else if([item isKindOfClass:[UIImage class]]) {
+            self.image = item;
+        } else if([item isKindOfClass:[NSURL class]]) {
+            self.URL = item;
+        }
+    }
+}
+
+- (UIViewController *)activityPerformingViewController
 {
     SLComposeViewController *facebookViewComposer = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
     
     if (!facebookViewComposer) {
-        return;
+        return nil;
     }
     
-    viewController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    if (text)
-        [facebookViewComposer setInitialText:text];
-    if (image)
-        [facebookViewComposer addImage:image];
-    if (url)
-        [facebookViewComposer addURL:url];
+    __typeof(&*self) __weak weakSelf = self;
+    facebookViewComposer.completionHandler = ^(SLComposeViewControllerResult result) {
+        BOOL completed = result == SLComposeViewControllerResultDone;
+        [weakSelf activityDidFinish:completed];
+    };
     
-    [viewController presentViewController:facebookViewComposer animated:YES completion:nil];
+    if (self.text)
+        [facebookViewComposer setInitialText:self.text];
+    if (self.image)
+        [facebookViewComposer addImage:self.image];
+    if (self.URL)
+        [facebookViewComposer addURL:self.URL];
+    
+    return facebookViewComposer;
 }
 
 @end

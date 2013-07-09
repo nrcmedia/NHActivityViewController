@@ -25,7 +25,6 @@
 //
 
 #import "OWActivity.h"
-#import <Social/Social.h>
 
 @interface OWFacebookActivity : OWActivity
 

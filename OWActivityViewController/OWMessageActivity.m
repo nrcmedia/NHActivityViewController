@@ -25,46 +25,70 @@
 
 #import "OWMessageActivity.h"
 #import "OWActivityViewController.h"
-#import "OWActivityDelegateObject.h"
+
+@interface OWMessageActivity()<MFMessageComposeViewControllerDelegate>
+@property (nonatomic,strong) NSString* text;
+@property (nonatomic,strong) NSURL* URL;
+@end
 
 @implementation OWMessageActivity
 
-- (id)init
-{
-    self = [super initWithTitle:NSLocalizedStringFromTable(@"activity.Message.title", @"OWActivityViewController", @"Message")
-                          image:[UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Message"]
-                    actionBlock:nil];
-    
-    if (!self)
-        return nil;
-    
-    __typeof(&*self) __weak weakSelf = self;
-    self.actionBlock = ^(OWActivity *activity, OWActivityViewController *activityViewController) {
-        NSDictionary *userInfo = weakSelf.userInfo ? weakSelf.userInfo : activityViewController.userInfo;
-        NSString *text = [userInfo objectForKey:@"text"];
-        NSURL *url = [userInfo objectForKey:@"url"];
-        [activityViewController dismissViewControllerAnimated:YES completion:^{
-            if (![MFMessageComposeViewController canSendText])
-                return;
-            
-            MFMessageComposeViewController *messageComposeViewController = [[MFMessageComposeViewController alloc] init];
-            [OWActivityDelegateObject sharedObject].controller = activityViewController.presentingController;
-            messageComposeViewController.messageComposeDelegate = [OWActivityDelegateObject sharedObject];
-            
-            if (text && !url)
-                messageComposeViewController.body = text;
-            
-            if (!text && url)
-                messageComposeViewController.body = url.absoluteString;
-            
-            if (text && url)
-                messageComposeViewController.body = [NSString stringWithFormat:@"%@ %@", text, url.absoluteString];
-            
-            [activityViewController.presentingController presentViewController:messageComposeViewController animated:YES completion:nil];
-        }];
-    };
-    
-    return self;
+- (NSString *)activityType {
+    return OWActivityTypeMessage;
 }
+
+- (NSString *)activityTitle {
+    return NSLocalizedStringFromTable(@"activity.Message.title", @"OWActivityViewController", @"Message");
+}
+
+- (UIImage *)activityImage {
+    return [UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Message"];
+}
+
+- (BOOL)canPerformWithActivityItems:(NSArray*)activityItems {
+    if (![MFMessageComposeViewController canSendText]) {
+        return NO;
+    }
+    for (id item in activityItems) {
+        if (  [item isKindOfClass:[NSString class]]
+            || [item isKindOfClass:[NSURL class]]
+            )
+        {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+    for (id item in activityItems) {
+        if ([item isKindOfClass:[NSString class]]) {
+            self.text = item;
+        } else if([item isKindOfClass:[NSURL class]]) {
+            self.URL = item;
+        }
+    }
+}
+
+- (UIViewController *)activityPerformingViewController {
+    MFMessageComposeViewController *messageComposeViewController = [[MFMessageComposeViewController alloc] init];
+    messageComposeViewController.messageComposeDelegate = self;
+    if (self.text && !self.URL)
+        messageComposeViewController.body = self.text;
+    
+    if (!self.text && self.URL)
+        messageComposeViewController.body = [self.URL absoluteString];
+    
+    if (self.text && self.URL)
+        messageComposeViewController.body = [NSString stringWithFormat:@"%@ %@", self.text, [self.URL absoluteString]];
+    return messageComposeViewController;
+}
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result
+{
+    BOOL completed = result == MessageComposeResultSent;
+    [self activityDidFinish:completed];
+}
+
 
 @end

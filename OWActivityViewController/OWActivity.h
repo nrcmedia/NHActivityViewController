@@ -26,19 +26,25 @@
 #import <Foundation/Foundation.h>
 
 @class OWActivityViewController;
-@class OWActivity;
 
-typedef void (^OWActivityActionBlock)(OWActivity *activity, OWActivityViewController *activityViewController);
+extern NSString* const OWActivityTypePostToFacebook;
+extern NSString* const OWActivityTypePostToTwitter;
+extern NSString* const OWActivityTypeMail;
+extern NSString* const OWActivityTypeMessage;
+extern NSString* const OWActivityTypePrint;
+extern NSString* const OWActivityTypeCopyToPasteboard;
+extern NSString* const OWActivityTypeSaveToCameraRoll;
 
 @interface OWActivity : NSObject
 
-@property (strong, readonly, nonatomic) NSString *title;
-@property (strong, readonly, nonatomic) UIImage *image;
-@property (copy, nonatomic) OWActivityActionBlock actionBlock;
-@property (weak, nonatomic) OWActivityViewController* delegate;
-@property (strong, nonatomic) NSDictionary *userInfo;
+@property (strong, readonly, nonatomic) NSString *activityType;
+@property (strong, readonly, nonatomic) NSString *activityTitle;
+@property (strong, readonly, nonatomic) UIImage *activityImage;
 
-- (id)initWithTitle:(NSString *)title image:(UIImage *)image actionBlock:(OWActivityActionBlock)actionBlock;
+@property (weak, nonatomic) OWActivityViewController* delegate;
+
+- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems;
+- (void)prepareWithActivityItems:(NSArray*)activityItems;
 - (void)performActivity;
 - (void)activityDidFinish:(BOOL)completed;
 - (UIViewController*)activityPerformingViewController;

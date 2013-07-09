@@ -26,39 +26,63 @@
 #import "OWCopyActivity.h"
 #import "OWActivityViewController.h"
 
+@interface OWCopyActivity()
+@property (nonatomic,strong) UIImage* image;
+@property (nonatomic,strong) NSString* text;
+@property (nonatomic,strong) NSURL* URL;
+@end
+
 @implementation OWCopyActivity
 
-- (id)init
-{
-    self = [super initWithTitle:NSLocalizedStringFromTable(@"activity.Copy.title", @"OWActivityViewController", @"Copy")
-                          image:[UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Copy"]
-                    actionBlock:nil];
-    
-    if (!self)
-        return nil;
-    
-    __typeof(&*self) __weak weakSelf = self;
-    self.actionBlock = ^(OWActivity *activity, OWActivityViewController *activityViewController) {
-        [activityViewController dismissViewControllerAnimated:YES completion:nil];
-        NSDictionary *userInfo = weakSelf.userInfo ? weakSelf.userInfo : activityViewController.userInfo;
-        
-        NSMutableDictionary * pasteboardDict = [NSMutableDictionary dictionary];        
-        NSString *text = [userInfo objectForKey:@"text"];
-        UIImage *image = [userInfo objectForKey:@"image"];
-        NSURL *url = [userInfo objectForKey:@"url"];
-        if (text)
-            [pasteboardDict setValue:text forKey:@"public.utf8-plain-text"];
-        if (url)
-            [pasteboardDict setValue:url forKey:@"public.url"];
-        if (image) {
-            NSData *imageData = [NSData dataWithData:UIImagePNGRepresentation(image)];
-            [pasteboardDict setObject:imageData forKey:@"public.png"];
+- (NSString *)activityType {
+    return OWActivityTypeCopyToPasteboard;
+}
+
+- (NSString *)activityTitle {
+    return NSLocalizedStringFromTable(@"activity.Copy.title", @"OWActivityViewController", @"Copy");
+}
+
+-(UIImage *)activityImage {
+    return [UIImage imageNamed:@"OWActivityViewController.bundle/Icon_Copy"];
+}
+
+- (BOOL)canPerformWithActivityItems:(NSArray*)activityItems {
+    for (id item in activityItems) {
+        if (  [item isKindOfClass:[NSString class]]
+            || [item isKindOfClass:[UIImage class]]
+            || [item isKindOfClass:[NSURL class]]
+            )
+        {
+            return YES;
         }
-        
-        [UIPasteboard generalPasteboard].items = [NSArray arrayWithObject:pasteboardDict];
-    };
-    
-    return self;
+    }
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+    for (id item in activityItems) {
+        if ([item isKindOfClass:[NSString class]]) {
+            self.text = item;
+        } else if([item isKindOfClass:[UIImage class]]) {
+            self.image = item;
+        } else if([item isKindOfClass:[NSURL class]]) {
+            self.URL = item;
+        }
+    }
+}
+
+- (void)performActivity {
+    NSMutableDictionary * pasteboardDict = [NSMutableDictionary dictionary];
+    if (self.text)
+        [pasteboardDict setValue:self.text forKey:@"public.utf8-plain-text"];
+    if (self.URL)
+        [pasteboardDict setValue:self.URL forKey:@"public.url"];
+    if (self.image) {
+        NSData *imageData = [NSData dataWithData:UIImagePNGRepresentation(self.image)];
+        [pasteboardDict setObject:imageData forKey:@"public.png"];
+    }
+    [UIPasteboard generalPasteboard].items = [NSArray arrayWithObject:pasteboardDict];
+    [self activityDidFinish:YES];
 }
 
 @end

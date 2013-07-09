@@ -26,17 +26,21 @@
 #import "OWActivity.h"
 #import "OWActivityViewController.h"
 
+NSString* const OWActivityTypePostToFacebook = @"PostToFacebook";
+NSString* const OWActivityTypePostToTwitter = @"PostToTwitter";
+NSString* const OWActivityTypeMail = @"Mail";
+NSString* const OWActivityTypeMessage = @"Message";
+NSString* const OWActivityTypePrint = @"Print";
+NSString* const OWActivityTypeCopyToPasteboard = @"CopyToPasteboard";
+NSString* const OWActivityTypeSaveToCameraRoll = @"SaveToCameraRoll";
+
 @implementation OWActivity
 
-- (id)initWithTitle:(NSString *)title image:(UIImage *)image actionBlock:(OWActivityActionBlock)actionBlock
-{
-    self = [super init];
-    if (self) {
-        _title = title;
-        _image = image;
-        _actionBlock = [actionBlock copy];
-    }
-    return self;
+- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
 }
 
 - (void)performActivity {
