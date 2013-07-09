@@ -28,6 +28,9 @@
 
 @interface OWActivityViewController ()
 @property (nonatomic,strong) OWActivityListViewController* listViewController;
+@property (nonatomic,assign) BOOL didFinishActivity;
+@property (nonatomic,strong) UIViewController* performingViewController;
+@property (nonatomic,strong) NSArray *activities;
 @end
 
 @implementation OWActivityViewController
@@ -99,19 +102,59 @@
     }];
 }
 
-#pragma mark - 
-#pragma mark Helpers
-
-- (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay
-{
-    block = [block copy];
-    [self performSelector:@selector(runBlockAfterDelay:) withObject:block afterDelay:delay];
+- (void)showActivity:(OWActivity*)activity {
+    if (activity.userInfo == nil) {
+        activity.userInfo = self.userInfo;
+    }
+    activity.delegate = self;
+    self.performingViewController = [activity activityPerformingViewController];
+    if (self.performingViewController) {
+        [self presentViewController:self.performingViewController animated:YES completion:nil];
+    } else {
+        [activity performActivity];
+        [self dismissViewControllerAnimated:NO completion:nil];
+    }
 }
 
-- (void)runBlockAfterDelay:(void (^)(void))block
-{
-	if (block != nil)
-		block();
+- (void)dismissListViewControllerWithCompletion:(void(^)(BOOL))completion {
+    if (self.popoverController) {
+        [self.popoverController dismissPopoverAnimated:YES];
+        completion(YES);
+    } else {
+        [self.listViewController willMoveToParentViewController:nil];
+        __weak OWActivityViewController* weakSelf = self;
+        [self.listViewController modalDismissAnimationWithCompletion:^(BOOL finished) {
+            [weakSelf.listViewController.view removeFromSuperview];
+            [weakSelf.listViewController removeFromParentViewController];
+            completion(finished);
+        }];
+    }
+}
+
+- (void)didFinishActivity:(OWActivity *)activity completed:(BOOL)completed {
+    self.didFinishActivity = YES;
+    __weak OWActivityViewController* weakSelf = self;
+    if (activity == nil) {
+        [self dismissListViewControllerWithCompletion:^(BOOL finished) {
+            [weakSelf dismissWithActivity:activity completed:completed];
+        }];
+        return;
+    }
+    if (self.performingViewController) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [weakSelf dismissWithActivity:activity completed:completed];
+        }];
+    } else {
+        [self dismissWithActivity:activity completed:completed];
+    }
+}
+
+- (void)dismissWithActivity:(OWActivity*)activity completed:(BOOL)completed {
+    [self dismissViewControllerAnimated:NO completion:nil];
+    if (self.completionHandler) {
+        Class activityClass = activity == nil ? nil : [activity class];
+        self.completionHandler(activityClass,completed);
+    }
 }
 
 #pragma mark -
