@@ -175,8 +175,7 @@
 - (void)dismissWithActivity:(OWActivity*)activity completed:(BOOL)completed {
     [self dismissViewControllerAnimated:NO completion:nil];
     if (self.completionHandler) {
-        Class activityClass = activity == nil ? nil : [activity class];
-        self.completionHandler(activityClass,completed);
+        self.completionHandler([activity activityType],completed);
     }
 }
 

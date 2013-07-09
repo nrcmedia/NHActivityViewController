@@ -29,8 +29,8 @@
 
 @interface OWActivityViewController : UIViewController
 
-@property (weak, nonatomic) UIPopoverController *popoverController;
-@property (copy, nonatomic) void (^completionHandler)(Class, BOOL);
+@property (nonatomic, weak) UIPopoverController *popoverController;
+@property (nonatomic, copy) void (^completionHandler)(NSString*, BOOL);
 
 - (id)initWithActivityItems:(NSArray*)items activities:(NSArray *)activities;
 
