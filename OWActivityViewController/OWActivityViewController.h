@@ -29,7 +29,6 @@
 
 @interface OWActivityViewController : UIViewController
 
-@property (strong, nonatomic) NSDictionary *userInfo;
 @property (weak, nonatomic) UIPopoverController *popoverController;
 @property (copy, nonatomic) void (^completionHandler)(Class, BOOL);
 

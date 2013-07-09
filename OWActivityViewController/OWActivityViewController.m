@@ -85,9 +85,6 @@
 }
 
 - (void)showActivity:(OWActivity*)activity {
-    if (activity.userInfo == nil) {
-        activity.userInfo = self.userInfo;
-    }
     activity.delegate = self;
     self.performingViewController = [activity activityPerformingViewController];
     if (self.performingViewController) {
