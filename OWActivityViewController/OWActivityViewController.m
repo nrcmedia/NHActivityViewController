@@ -30,16 +30,18 @@
 @property (nonatomic,strong) OWActivityListViewController* listViewController;
 @property (nonatomic,assign) BOOL didFinishActivity;
 @property (nonatomic,strong) UIViewController* performingViewController;
-@property (nonatomic,strong) NSArray *activities;
+@property (nonatomic,strong) NSArray* activities;
+@property (nonatomic,strong) NSArray* items;
 @end
 
 @implementation OWActivityViewController
 
-- (id)initWithActivities:(NSArray *)activities
+- (id)initWithActivityItems:(NSArray*)items activities:(NSArray *)activities
 {
     self = [super init];
     if (self) {
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        self.items = items;
         self.activities = activities;
     }
     return self;

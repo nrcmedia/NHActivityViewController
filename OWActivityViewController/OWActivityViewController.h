@@ -33,9 +33,7 @@
 @property (weak, nonatomic) UIPopoverController *popoverController;
 @property (copy, nonatomic) void (^completionHandler)(Class, BOOL);
 
-
-
-- (id)initWithActivities:(NSArray *)activities;
+- (id)initWithActivityItems:(NSArray*)items activities:(NSArray *)activities;
 
 #pragma private
 - (void)performActivity:(OWActivity*)activity;
