@@ -37,51 +37,46 @@
     
     if (!self)
         return nil;
-    
-    __typeof(&*self) __weak weakSelf = self;
-    self.actionBlock = ^(OWActivity *activity, OWActivityViewController *activityViewController) {
-        UIViewController *presenter = activityViewController.presentingController;
-        NSDictionary *userInfo = weakSelf.userInfo ? weakSelf.userInfo : activityViewController.userInfo;
-        
-        [activityViewController dismissViewControllerAnimated:YES completion:^{
-            [weakSelf shareFromViewController:presenter
-                                           text:[userInfo objectForKey:@"text"]
-                                            url:[userInfo objectForKey:@"url"]
-                                          image:[userInfo objectForKey:@"image"]];
-            
-        }];
-    };
-    
     return self;
 }
 
 
-- (void)shareFromViewController:(UIViewController *)viewController text:(NSString *)text url:(NSURL *)url image:(UIImage *)image
-{
+- (UIViewController *)activityPerformingViewController {
     id twitterViewComposer = nil;
-    
+    NSDictionary* userInfo = self.userInfo;
+    __weak OWTwitterActivity* weakSelf = self;
     if( NSClassFromString (@"UIActivityViewController") ) {
             // ios 6
-            twitterViewComposer = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+        SLComposeViewController* composeVC = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
         if (!twitterViewComposer) {
-            return;
+            return nil;
         }
+        composeVC.completionHandler = ^(SLComposeViewControllerResult result){
+            BOOL completed = result == SLComposeViewControllerResultDone;
+            [weakSelf activityDidFinish:completed];
+        };
     } else {
         // ios 5
-        twitterViewComposer = [[TWTweetComposeViewController alloc] init];
+        TWTweetComposeViewController* composeVC = [[TWTweetComposeViewController alloc] init];
+        composeVC.completionHandler = ^(TWTweetComposeViewControllerResult result){
+            BOOL completed = result == TWTweetComposeViewControllerResultDone;
+            [weakSelf activityDidFinish:completed];
+        };
+        twitterViewComposer = composeVC;
     }
     
     if (twitterViewComposer) {
-        viewController.modalPresentationStyle = UIModalPresentationCurrentContext;
+        NSString* text  = [userInfo objectForKey:@"text"];
+        NSURL* url = [userInfo objectForKey:@"url"];
+        UIImage* image = [userInfo objectForKey:@"image"];
         if (text)
             [twitterViewComposer setInitialText:text];
         if (image)
             [twitterViewComposer addImage:image];
         if (url)
             [twitterViewComposer addURL:url];
-        
-        [viewController presentViewController:twitterViewComposer animated:YES completion:nil];
     }
+    return twitterViewComposer;
 }
 
 @end
