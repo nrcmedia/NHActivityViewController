@@ -24,6 +24,7 @@
 //
 
 #import "OWActivity.h"
+#import "OWActivityViewController.h"
 
 @implementation OWActivity
 
@@ -38,4 +39,14 @@
     return self;
 }
 
+- (void)performActivity {
+}
+
+- (void)activityDidFinish:(BOOL)completed {
+    [self.delegate didFinishActivity:self completed:completed];
+}
+
+- (UIViewController *)activityPerformingViewController {
+    return nil;
+}
 @end

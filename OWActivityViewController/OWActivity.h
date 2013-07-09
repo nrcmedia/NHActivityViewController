@@ -39,5 +39,7 @@ typedef void (^OWActivityActionBlock)(OWActivity *activity, OWActivityViewContro
 @property (strong, nonatomic) NSDictionary *userInfo;
 
 - (id)initWithTitle:(NSString *)title image:(UIImage *)image actionBlock:(OWActivityActionBlock)actionBlock;
-
+- (void)performActivity;
+- (void)activityDidFinish:(BOOL)completed;
+- (UIViewController*)activityPerformingViewController;
 @end
