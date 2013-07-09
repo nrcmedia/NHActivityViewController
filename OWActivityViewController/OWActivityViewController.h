@@ -34,9 +34,6 @@
 @property (copy, nonatomic) void (^completionHandler)(Class, BOOL);
 
 
-- (id)initWithViewController:(UIViewController *)viewController activities:(NSArray *)activities;
-- (void)presentFromRootViewController;
-- (void)presentFromViewController:(UIViewController*)viewController;
 
 - (id)initWithActivities:(NSArray *)activities;
 
