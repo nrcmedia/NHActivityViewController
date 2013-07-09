@@ -42,44 +42,41 @@
     if (!self)
         return nil;
     
-    __typeof(&*self) __weak weakSelf = self;
-    self.actionBlock = ^(OWActivity *activity, OWActivityViewController *activityViewController) {
-        NSDictionary *userInfo = weakSelf.userInfo ? weakSelf.userInfo : activityViewController.userInfo;
-        NSString *subject = [userInfo objectForKey:@"subject"];
-        NSString *text = [userInfo objectForKey:@"text"];
-        UIImage *image = [userInfo objectForKey:@"image"];
-        NSURL *url = [userInfo objectForKey:@"url"];
-        
-        [activityViewController dismissViewControllerAnimated:YES completion:^{
-            MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
-            [OWActivityDelegateObject sharedObject].controller = activityViewController.presentingController;
-            mailComposeViewController.mailComposeDelegate = [OWActivityDelegateObject sharedObject];
-            
-            if (text && !url)
-                [mailComposeViewController setMessageBody:text isHTML:YES];
-            
-            if (!text && url)
-                [mailComposeViewController setMessageBody:url.absoluteString isHTML:YES];
-            
-            if (text && url)
-                [mailComposeViewController setMessageBody:[NSString stringWithFormat:@"%@ %@", text, url.absoluteString] isHTML:YES];
-            
-            if (image)
-                [mailComposeViewController addAttachmentData:UIImageJPEGRepresentation(image, 0.75f) mimeType:@"image/jpeg" fileName:@"photo.jpg"];
-            
-            if (subject)
-                [mailComposeViewController setSubject:subject];
-            
-            if(![MFMailComposeViewController canSendMail]){
-                return;
-            }
-            
-            [activityViewController.presentingController presentViewController:mailComposeViewController animated:YES completion:nil];
-        }];
-    };
-    
     return self;
 }
+
+- (UIViewController *)activityPerformingViewController {
+    if(![MFMailComposeViewController canSendMail]){
+        return nil;
+    }
+    NSDictionary *userInfo = self.userInfo;
+    NSString *subject = [userInfo objectForKey:@"subject"];
+    NSString *text = [userInfo objectForKey:@"text"];
+    UIImage *image = [userInfo objectForKey:@"image"];
+    NSURL *url = [userInfo objectForKey:@"url"];
+    MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
+    mailComposeViewController.mailComposeDelegate = self;
+
+    if (subject) {
+        [mailComposeViewController setSubject:subject];
+    }
+
+    if (text && !url)
+        [mailComposeViewController setMessageBody:text isHTML:YES];
+
+    if (!text && url)
+        [mailComposeViewController setMessageBody:url.absoluteString isHTML:YES];
+    
+    if (text && url)
+        [mailComposeViewController setMessageBody:[NSString stringWithFormat:@"%@ %@", text, url.absoluteString] isHTML:YES];
+    
+    if (image)
+        [mailComposeViewController addAttachmentData:UIImageJPEGRepresentation(image, 0.75f) mimeType:@"image/jpeg" fileName:@"photo.jpg"];
+    
+    
+    return mailComposeViewController;
+}
+
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
 {
