@@ -49,9 +49,5 @@ static OWActivityDelegateObject *_sharedObject = nil;
     [self.controller dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
-{
-    [self.controller dismissViewControllerAnimated:YES completion:nil];
-}
 
 @end

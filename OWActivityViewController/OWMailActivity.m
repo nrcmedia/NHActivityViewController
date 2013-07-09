@@ -27,6 +27,9 @@
 #import "OWActivityViewController.h"
 #import "OWActivityDelegateObject.h"
 
+@interface OWMailActivity()<MFMailComposeViewControllerDelegate>
+@end
+
 @implementation OWMailActivity
 
 - (id)init
@@ -78,4 +81,9 @@
     return self;
 }
 
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+    BOOL completed = result == MFMailComposeResultSent;
+    [self.delegate didFinishActivity:self completed:completed];
+}
 @end

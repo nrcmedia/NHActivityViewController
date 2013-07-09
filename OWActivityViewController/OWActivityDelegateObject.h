@@ -26,7 +26,7 @@
 #import <Foundation/Foundation.h>
 #import <MessageUI/MessageUI.h>
 
-@interface OWActivityDelegateObject : NSObject <MFMessageComposeViewControllerDelegate, MFMailComposeViewControllerDelegate, UINavigationControllerDelegate>
+@interface OWActivityDelegateObject : NSObject <MFMessageComposeViewControllerDelegate, UINavigationControllerDelegate>
 
 @property (strong, nonatomic) UIViewController *controller;
 
