@@ -105,8 +105,8 @@
     button.frame = CGRectMake(10, 0, 59, 59);
     button.tag = index;
     [button addTarget:self action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [button setBackgroundImage:activity.image forState:UIControlStateNormal];
-    button.accessibilityLabel = activity.title;
+    [button setBackgroundImage:[activity activityImage] forState:UIControlStateNormal];
+    button.accessibilityLabel = [activity activityTitle];
     [view addSubview:button];
     
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 59, 80, 30)];
@@ -115,7 +115,7 @@
     label.textColor = [UIColor whiteColor];
     label.shadowColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.75];
     label.shadowOffset = CGSizeMake(0, 1);
-    label.text = activity.title;
+    label.text = [activity activityTitle];
     label.font = [UIFont boldSystemFontOfSize:12];
     label.numberOfLines = 0;
     [label setNumberOfLines:0];
