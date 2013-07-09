@@ -25,11 +25,8 @@
 
 #import "OWFacebookActivity.h"
 #import "OWTwitterActivity.h"
-#import "OWSinaWeiboActivity.h"
 #import "OWMessageActivity.h"
 #import "OWMailActivity.h"
 #import "OWPrintActivity.h"
 #import "OWCopyActivity.h"
-#import "OWSafariActivity.h"
-#import "OWMapsActivity.h"
 #import "OWSaveToCameraRollActivity.h"
