@@ -45,28 +45,8 @@
     return self;
 }
 
-- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        __typeof (&*self) __weak weakSelf = self;
-        [UIView animateWithDuration:0.4 animations:^{
-            _backgroundView.alpha = 0;
-            CGRect frame = _activityView.frame;
-            frame.origin.y = [UIScreen mainScreen].bounds.size.height;
-            _activityView.frame = frame;
-        } completion:^(BOOL finished) {
-            [weakSelf.view removeFromSuperview];
-            [weakSelf removeFromParentViewController];
-            if (completion)
-                completion();
-        }];
-    } else {
-        [self.presentingPopoverController dismissPopoverAnimated:YES];
-        [self performBlock:^{
-            if (completion)
-                completion();
-        } afterDelay:0.4];
-    }
+- (void)setPopoverController:(UIPopoverController *)popoverController {
+    self.listViewController.popoverController = popoverController;
 }
 
 - (UIPopoverController *)popoverController {

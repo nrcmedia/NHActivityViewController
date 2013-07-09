@@ -29,14 +29,16 @@
 
 @interface OWActivityViewController : UIViewController
 
-@property (strong, readonly, nonatomic) NSArray *activities;
 @property (strong, nonatomic) NSDictionary *userInfo;
-@property (strong, nonatomic) OWActivityView *activityView;
-@property (weak, nonatomic) UIPopoverController *presentingPopoverController;
-@property (weak, nonatomic) UIViewController *presentingController;
+@property (weak, nonatomic) UIPopoverController *popoverController;
 
 - (id)initWithViewController:(UIViewController *)viewController activities:(NSArray *)activities;
 - (void)presentFromRootViewController;
 - (void)presentFromViewController:(UIViewController*)viewController;
 
+- (id)initWithActivities:(NSArray *)activities;
+
+#pragma private
+- (void)performActivity:(OWActivity*)activity;
+- (void)didFinishActivity:(OWActivity*)activity completed:(BOOL)completed;
 @end
