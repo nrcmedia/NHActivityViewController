@@ -40,6 +40,7 @@
 }
 
 - (void)performActivity {
+    [self activityDidFinish:YES];
 }
 
 - (void)activityDidFinish:(BOOL)completed {
