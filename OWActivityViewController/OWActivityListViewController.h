@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+@class OWActivityViewController;
 
 @interface OWActivityListViewController : UIViewController
+@property (strong, nonatomic) NSArray *activities;
+@property (strong, nonatomic) OWActivityViewController* activityViewController;
+@property (weak, nonatomic) UIPopoverController *popoverController;
 
+- (void)modalDismissAnimationWithCompletion:(void(^)(BOOL))completion;
 @end

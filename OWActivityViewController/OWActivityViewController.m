@@ -24,54 +24,20 @@
 //
 
 #import "OWActivityViewController.h"
-#import "OWActivityView.h"
+#import "OWActivityListViewController.h"
 
 @interface OWActivityViewController ()
-
-- (NSInteger)height;
-
+@property (nonatomic,strong) OWActivityListViewController* listViewController;
 @end
 
 @implementation OWActivityViewController
 
-- (void)loadView
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-        self.view = [[UIView alloc] initWithFrame:rootViewController.view.bounds];
-        self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    } else {
-        [super loadView];
-    }
-}
-
-- (id)initWithViewController:(UIViewController *)viewController activities:(NSArray *)activities
+- (id)initWithActivities:(NSArray *)activities
 {
     self = [super init];
     if (self) {
-        self.presentingController = viewController;
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-            _backgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
-            _backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-            _backgroundView.backgroundColor = [UIColor blackColor];
-            _backgroundView.alpha = 0;
-            [self.view addSubview:_backgroundView];
-        } else {
-            self.view.frame = CGRectMake(0, 0, 320, 417);
-        }
-        
-        _activities = activities;
-        _activityView = [[OWActivityView alloc] initWithFrame:CGRectMake(0,
-                                                                         UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone ?
-                                                                         [UIScreen mainScreen].bounds.size.height : 0,
-                                                                         self.view.frame.size.width, self.height)
-                                                   activities:activities];
-        _activityView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        _activityView.activityViewController = self;
-        [self.view addSubview:_activityView];
-        
-        self.contentSizeForViewInPopover = CGSizeMake(320, self.height - 60);
+        self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        self.activities = activities;
     }
     return self;
 }
@@ -100,42 +66,37 @@
     }
 }
 
-- (void)presentFromRootViewController
-{
-    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-    [self presentFromViewController:rootViewController];
+- (UIPopoverController *)popoverController {
+    return self.listViewController.popoverController;
 }
 
-- (void)presentFromViewController:(UIViewController *)viewController {
-    [viewController addChildViewController:self];
-    [viewController.view addSubview:self.view];
-    [self didMoveToParentViewController:viewController];
+- (CGSize)contentSizeForViewInPopover {
+    return self.listViewController.contentSizeForViewInPopover;
 }
 
-- (void)didMoveToParentViewController:(UIViewController *)parent
-{
-    [super didMoveToParentViewController:parent];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        [UIView animateWithDuration:0.4 animations:^{
-            _backgroundView.alpha = 0.4;
-            
-            CGRect frame = _activityView.frame;
-            frame.origin.y = self.view.frame.size.height - self.height;
-            _activityView.frame = frame;
-        }];
+- (OWActivityListViewController*)listViewController {
+    if (_listViewController == nil) {
+        _listViewController = [[OWActivityListViewController alloc] init];
+        _listViewController.activityViewController = self;
+        _listViewController.activities = self.activities;
+    }
+    return _listViewController;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (!self.didFinishActivity) {
+        [self addChildViewController:self.listViewController];
+        [self.view addSubview:self.listViewController.view];
+        [self.listViewController didMoveToParentViewController:self];
     }
 }
 
-- (NSInteger)height
-{   
-    if (_activities.count <= 3) return 214;
-    if (_activities.count <= 6) return 317;
-    return 417;
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
+- (void)performActivity:(OWActivity *)activity {
+    __weak OWActivityViewController* weakSelf = self;
+    [self dismissListViewControllerWithCompletion:^(BOOL finished) {
+        [weakSelf showActivity:activity];
+    }];
 }
 
 #pragma mark - 

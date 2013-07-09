@@ -24,12 +24,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "OWActivityView.h"
+#import "OWActivityListView.h"
 #import "OWActivities.h"
 
-@interface OWActivityViewController : UIViewController {
-    UIView *_backgroundView;
-}
+@interface OWActivityViewController : UIViewController
 
 @property (strong, readonly, nonatomic) NSArray *activities;
 @property (strong, nonatomic) NSDictionary *userInfo;
