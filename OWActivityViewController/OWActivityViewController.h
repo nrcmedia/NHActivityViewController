@@ -31,6 +31,8 @@
 
 @property (strong, nonatomic) NSDictionary *userInfo;
 @property (weak, nonatomic) UIPopoverController *popoverController;
+@property (copy, nonatomic) void (^completionHandler)(Class, BOOL);
+
 
 - (id)initWithViewController:(UIViewController *)viewController activities:(NSArray *)activities;
 - (void)presentFromRootViewController;
