@@ -148,7 +148,12 @@
     activity.delegate = self;
     self.performingViewController = [activity activityPerformingViewController];
     if (self.performingViewController) {
-        [self presentViewController:self.performingViewController animated:YES completion:nil];
+        if ([activity isKindOfClass:[OWTwitterActivity class]]) {
+            //TWTweetComposeViewController won't display correctly on iPad landscape when presented using the new API
+            [self presentModalViewController:self.performingViewController animated:YES];
+        } else {
+            [self presentViewController:self.performingViewController animated:YES completion:nil];
+        }
     } else {
         [activity performActivity];
         [self dismissViewControllerAnimated:NO completion:nil];
