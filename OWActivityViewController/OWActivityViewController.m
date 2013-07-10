@@ -37,7 +37,17 @@
 
 @implementation OWActivityViewController
 
-- (id)initWithActivityItems:(NSArray*)items activities:(NSArray *)activities
++ (NSArray*)builtinActivities {
+    return @[[[OWMailActivity alloc] init]
+             ,[[OWMessageActivity alloc] init]
+             ,[[OWTwitterActivity alloc] init]
+             ,[[OWFacebookActivity alloc] init]
+             ,[[OWCopyActivity alloc] init]
+             ,[[OWSaveToCameraRollActivity alloc] init]
+             ,[[OWPrintActivity alloc] init]
+             ];
+}
+
 - (id)initWithActivityItems:(NSArray*)items applicationActivities:(NSArray *)applicationActivities
 {
     self = [super init];
@@ -92,8 +102,13 @@
 }
 
 - (NSArray*)performableActivities {
-    NSMutableArray* performableActivities = [[NSMutableArray alloc] initWithCapacity:[self.activities count]];
-    for (OWActivity* activity in self.activities) {
+    NSMutableArray* performableActivities = [NSMutableArray arrayWithCapacity:[self.applicationActivities count]];
+    NSMutableArray* activities = [NSMutableArray arrayWithArray:[OWActivityViewController builtinActivities]];
+    [activities addObjectsFromArray:self.applicationActivities];
+    for (OWActivity* activity in activities) {
+        if (self.excludedActivityTypes != nil && [self.excludedActivityTypes containsObject:[activity activityType]]) {
+            continue;
+        }
         NSArray* items = [self placeHolderItemsForActivityType:[activity activityType]];
         if ([activity canPerformWithActivityItems:items]) {
             [performableActivities addObject:activity];

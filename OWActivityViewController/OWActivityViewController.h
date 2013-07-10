@@ -31,6 +31,7 @@
 
 @property (nonatomic, weak) UIPopoverController *popoverController;
 @property (nonatomic, copy) void (^completionHandler)(NSString*, BOOL);
+@property (nonatomic, copy) NSArray *excludedActivityTypes;
 
 - (id)initWithActivityItems:(NSArray*)items applicationActivities:(NSArray *)applicationActivities;
 
