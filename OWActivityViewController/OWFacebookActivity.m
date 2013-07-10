@@ -47,9 +47,10 @@
 }
 
 - (BOOL)canPerformWithActivityItems:(NSArray*)activityItems {
-    if (!NSClassFromString(@"SLComposeViewController")) {
-        return NO;
-    }
+    //If you don't have the Facebook SDK included, we can't help you
+    #ifndef FB_SESSIONSTATEOPENBIT
+    return NO;
+    #endif
     for (id item in activityItems) {
         if (  [item isKindOfClass:[NSString class]]
             || [item isKindOfClass:[UIImage class]]
