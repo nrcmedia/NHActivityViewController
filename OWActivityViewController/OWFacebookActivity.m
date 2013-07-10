@@ -77,6 +77,7 @@
 
 - (UIViewController *)activityPerformingViewController
 {
+    //TODO: replace by facebook API
     SLComposeViewController *facebookViewComposer = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
     
     if (!facebookViewComposer) {
