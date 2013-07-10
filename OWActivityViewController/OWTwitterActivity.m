@@ -49,6 +49,9 @@
 }
 
 - (BOOL)canPerformWithActivityItems:(NSArray*)activityItems {
+    if (!NSClassFromString(@"TWTweetComposeViewController")) {
+        return NO;
+    }
     for (id item in activityItems) {
         if (  [item isKindOfClass:[NSString class]]
             || [item isKindOfClass:[UIImage class]]
@@ -74,37 +77,20 @@
 }
 
 - (UIViewController *)activityPerformingViewController {
-    id twitterViewComposer = nil;
+    TWTweetComposeViewController* composeViewController = [[TWTweetComposeViewController alloc] init];
     __weak OWTwitterActivity* weakSelf = self;
-    if(NSClassFromString(@"SLComposeViewController")) {
-        // ios 6
-        SLComposeViewController* composeVC = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
-        if (!twitterViewComposer) {
-            return nil;
-        }
-        composeVC.completionHandler = ^(SLComposeViewControllerResult result){
-            BOOL completed = result == SLComposeViewControllerResultDone;
-            [weakSelf activityDidFinish:completed];
-        };
-    } else {
-        // ios 5
-        TWTweetComposeViewController* composeVC = [[TWTweetComposeViewController alloc] init];
-        composeVC.completionHandler = ^(TWTweetComposeViewControllerResult result){
-            BOOL completed = result == TWTweetComposeViewControllerResultDone;
-            [weakSelf activityDidFinish:completed];
-        };
-        twitterViewComposer = composeVC;
-    }
+    composeViewController.completionHandler = ^(TWTweetComposeViewControllerResult result){
+        BOOL completed = result == TWTweetComposeViewControllerResultDone;
+        [weakSelf activityDidFinish:completed];
+    };
     
-    if (twitterViewComposer) {
-        if (self.text)
-            [twitterViewComposer setInitialText:self.text];
-        if (self.image)
-            [twitterViewComposer addImage:self.image];
-        if (self.URL)
-            [twitterViewComposer addURL:self.URL];
-    }
-    return twitterViewComposer;
+    if (self.text)
+        [composeViewController setInitialText:self.text];
+    if (self.image)
+        [composeViewController addImage:self.image];
+    if (self.URL)
+        [composeViewController addURL:self.URL];
+    return composeViewController;
 }
 
 @end
