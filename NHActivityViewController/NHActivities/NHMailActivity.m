@@ -90,8 +90,8 @@
     mailComposeViewController.mailComposeDelegate = self;
 
     NSString* subject = nil;
-    
-    if ([[self.URL scheme] isEqualToString:@"mailto"]) {
+    BOOL isMailToURL = [[self.URL scheme] isEqualToString:@"mailto"];
+    if (isMailToURL) {
         NSDictionary* parameters = [self parameterDictionaryFromURL:self.URL];
         subject = [parameters objectForKey:@"subject"];
     }
@@ -103,10 +103,10 @@
     if (self.text && !self.URL)
         [mailComposeViewController setMessageBody:self.text isHTML:YES];
 
-    if (!self.text && self.URL)
+    if (!self.text && self.URL && !isMailToURL)
         [mailComposeViewController setMessageBody:[self.URL absoluteString] isHTML:YES];
     
-    if (self.text && self.URL)
+    if (self.text && self.URL && !isMailToURL)
         [mailComposeViewController setMessageBody:[NSString stringWithFormat:@"%@ %@", self.text, [self.URL absoluteString]] isHTML:YES];
     
     if (self.image)
