@@ -110,7 +110,7 @@
         [mailComposeViewController setMessageBody:[NSString stringWithFormat:@"%@ %@", self.text, [self.URL absoluteString]] isHTML:YES];
     
     if (self.image)
-        [mailComposeViewController addAttachmentData:UIImageJPEGRepresentation(self.image, 0.75f) mimeType:@"image/jpeg" fileName:@"photo.jpg"];
+        [mailComposeViewController addAttachmentData:UIImagePNGRepresentation(self.image) mimeType:@"image/png" fileName:@"Image-1.png"];
     
     
     return mailComposeViewController;
