@@ -34,7 +34,14 @@
 
 - (UIViewController*)createNHActivityViewController {
     NHActivityViewController* activityVC = [[NHActivityViewController alloc] initWithActivityItems:self.items applicationActivities:nil];
-    activityVC.excludedActivityTypes = @[NHActivityTypePrint];
+    activityVC.excludedActivityTypes = @[ NHActivityTypePostToFacebook
+                                        , NHActivityTypePostToTwitter
+//                                        , NHActivityTypeMail
+                                        , NHActivityTypeMessage
+                                        , NHActivityTypePrint
+                                        , NHActivityTypeCopyToPasteboard
+//                                        , NHActivityTypeSaveToCameraRoll
+                                        ];
     __weak NHActivityController* weakSelf = self;
     activityVC.completionHandler = ^(NSString* activityType, BOOL completed) {
         weakSelf.sharePopover.delegate = nil;
@@ -53,13 +60,14 @@
         [weakSelf isDismissed];
     };
     activityVC.excludedActivityTypes = @[UIActivityTypePostToWeibo
-//                                         ,UIActivityTypePostToFacebook
-//                                         ,UIActivityTypePostToTwitter
+                                         ,UIActivityTypePostToFacebook
+                                         ,UIActivityTypePostToTwitter
+//                                         ,UIActivityTypeMail
                                          ,UIActivityTypeMessage
                                          ,UIActivityTypePrint
                                          ,UIActivityTypeCopyToPasteboard
                                          ,UIActivityTypeAssignToContact
-                                         ,UIActivityTypeSaveToCameraRoll
+//                                         ,UIActivityTypeSaveToCameraRoll
                                          ];
     return activityVC;
 }
