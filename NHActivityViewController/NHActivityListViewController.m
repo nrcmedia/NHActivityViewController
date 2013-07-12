@@ -19,15 +19,6 @@
 
 @synthesize popoverController = popoverController_;
 
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        self.contentSizeForViewInPopover = CGSizeMake(320, self.height - 60);
-    }
-    return self;
-}
-
 - (void)loadView {
     [super loadView];
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
@@ -53,6 +44,10 @@
     [self.view addSubview:self.activityView];
 }
 
+- (CGSize)contentSizeForViewInPopover {
+    return CGSizeMake(320, self.height - 60);
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     if (!self.popoverController) {
@@ -73,6 +68,7 @@
         _activityView.frame = frame;
     } completion:completion];
 }
+
 
 - (NSInteger)height
 {

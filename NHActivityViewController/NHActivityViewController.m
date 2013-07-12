@@ -128,8 +128,8 @@
 - (NHActivityListViewController*)listViewController {
     if (_listViewController == nil) {
         _listViewController = [[NHActivityListViewController alloc] init];
-        _listViewController.activityViewController = self;
         _listViewController.activities = [self performableActivities];
+        _listViewController.activityViewController = self;
     }
     return _listViewController;
 }
