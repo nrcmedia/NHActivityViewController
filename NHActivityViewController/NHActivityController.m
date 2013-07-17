@@ -10,7 +10,7 @@
 #import "NHActivityViewController.h"
 
 @interface NHActivityController()<UIPopoverControllerDelegate>
-@property (nonatomic,strong) NSArray* items;
+@property (nonatomic, strong) NSArray* items;
 @property (nonatomic, strong) UIPopoverController* sharePopover;
 @property (nonatomic, strong) UIViewController* presentingViewController;
 @end
