@@ -36,10 +36,6 @@
 
 @implementation NHMailActivity
 
-- (void)dealloc {
-    CLS_LOG(@"dealloc");
-}
-
 - (NSString *)activityType {
     return NHActivityTypeMail;
 }
