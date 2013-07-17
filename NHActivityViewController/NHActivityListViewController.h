@@ -11,7 +11,7 @@
 
 @interface NHActivityListViewController : UIViewController
 @property (strong, nonatomic) NSArray *activities;
-@property (strong, nonatomic) NHActivityViewController* activityViewController;
+@property (weak, nonatomic) NHActivityViewController* activityViewController;
 @property (weak, nonatomic) UIPopoverController *popoverController;
 
 - (void)modalDismissAnimationWithCompletion:(void(^)(BOOL))completion;
