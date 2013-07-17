@@ -125,8 +125,9 @@
 #pragma mark - UIPopoverControllerDelegate
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
-    [self isDismissed];
+    self.sharePopover.delegate = nil;
     self.sharePopover = nil;
+    [self isDismissed];
 }
 
 @end
