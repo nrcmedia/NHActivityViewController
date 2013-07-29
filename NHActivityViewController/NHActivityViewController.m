@@ -165,7 +165,9 @@
         }
         NSOperation* completionOperation = [[NSOperation alloc] init];
         completionOperation.completionBlock = ^{
-            [weakSelf performActivityWithProvidedItems:activity];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf performActivityWithProvidedItems:activity];
+            });
         };
         for (NHActivityItemProvider* provider in providers) {
             [provider setActivityType:[activity activityType]];
