@@ -8,6 +8,8 @@
 
 #import "NHActivityController.h"
 #import "NHActivityViewController.h"
+#import "NHActivityItemProvider.h"
+#import "NHActivityItemProviderWrapper.h"
 
 @interface NHActivityController()<UIPopoverControllerDelegate>
 @property (nonatomic, strong) NSArray* items;
@@ -66,7 +68,16 @@
 }
 
 - (UIViewController*)createNativeActivityViewController {
-    UIActivityViewController* activityVC = [[UIActivityViewController alloc] initWithActivityItems:self.items applicationActivities:nil];
+    NSMutableArray* items = [NSMutableArray arrayWithCapacity:[self.items count]];
+    for (id item in self.items) {
+        id newItem = item;
+        if ([newItem isKindOfClass:[NHActivityItemProvider class]]) {
+            newItem = [[NHActivityItemProviderWrapper alloc] initWithItemProvider:item];
+        }
+        [items addObject:newItem];
+    }
+    
+    UIActivityViewController* activityVC = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
     __weak NHActivityController* weakSelf = self;
     activityVC.completionHandler = ^(NSString *activityType, BOOL completed) {
         weakSelf.sharePopover.delegate = nil;
