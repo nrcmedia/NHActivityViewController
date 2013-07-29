@@ -34,14 +34,7 @@
 
 - (UIViewController*)createNHActivityViewController {
     NHActivityViewController* activityVC = [[NHActivityViewController alloc] initWithActivityItems:self.items applicationActivities:nil];
-    activityVC.excludedActivityTypes = @[ NHActivityTypePostToFacebook
-                                        , NHActivityTypePostToTwitter
-//                                        , NHActivityTypeMail
-                                        , NHActivityTypeMessage
-                                        , NHActivityTypePrint
-                                        , NHActivityTypeCopyToPasteboard
-//                                        , NHActivityTypeSaveToCameraRoll
-                                        ];
+    activityVC.excludedActivityTypes = self.excludedActivityTypes;
     __weak NHActivityController* weakSelf = self;
     activityVC.completionHandler = ^(NSString* activityType, BOOL completed) {
         weakSelf.sharePopover.delegate = nil;
@@ -49,6 +42,27 @@
         [weakSelf isDismissed];
     };
     return activityVC;
+}
+
+- (NSArray*)UIActivityTypesForNHActivityTypes:(NSArray*)activityTypes {
+    NSMutableArray* UIActivityTypes = [NSMutableArray arrayWithCapacity:[activityTypes count]];
+    NSDictionary* activityTypeTranslation = @{   NHActivityTypeCopyToPasteboard:UIActivityTypeCopyToPasteboard
+                                               , NHActivityTypeMail:UIActivityTypeMail
+                                               , NHActivityTypeMessage: UIActivityTypeMessage
+                                               , NHActivityTypePostToFacebook: UIActivityTypePostToFacebook
+                                               , NHActivityTypePostToTwitter: UIActivityTypePostToTwitter
+                                               , NHActivityTypePrint: UIActivityTypePrint
+                                               , NHActivityTypeSaveToCameraRoll: UIActivityTypeSaveToCameraRoll
+                                               , NHActivityTypeAssignToContact: UIActivityTypeAssignToContact
+                                             };
+    
+    for (NSString* activityType in activityTypes) {
+        NSString* UIActivityType = activityTypeTranslation[activityType];
+        if (UIActivityType != nil) {
+            [UIActivityTypes addObject:UIActivityType];
+        }
+    }
+    return UIActivityTypes;
 }
 
 - (UIViewController*)createNativeActivityViewController {
@@ -59,16 +73,7 @@
         weakSelf.sharePopover = nil;
         [weakSelf isDismissed];
     };
-    activityVC.excludedActivityTypes = @[UIActivityTypePostToWeibo
-                                         ,UIActivityTypePostToFacebook
-                                         ,UIActivityTypePostToTwitter
-//                                         ,UIActivityTypeMail
-                                         ,UIActivityTypeMessage
-                                         ,UIActivityTypePrint
-                                         ,UIActivityTypeCopyToPasteboard
-                                         ,UIActivityTypeAssignToContact
-//                                         ,UIActivityTypeSaveToCameraRoll
-                                         ];
+    activityVC.excludedActivityTypes = [self UIActivityTypesForNHActivityTypes:self.excludedActivityTypes];
     return activityVC;
 }
 
