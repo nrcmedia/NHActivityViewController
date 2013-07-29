@@ -25,6 +25,8 @@
 
 #import "NHActivityViewController.h"
 #import "NHActivityListViewController.h"
+#import "NHActivityItemProvider.h"
+#import "NHActivityItemSource.h"
 
 #import "NHMailActivity.h"
 #import "NHMessageActivity.h"
@@ -41,6 +43,7 @@
 @property (nonatomic,strong) NSArray* applicationActivities;
 @property (nonatomic,strong) NSArray* items;
 @property (nonatomic,strong) NSArray* rawItemCache;
+@property (nonatomic,strong) NSOperationQueue* operationQueue;
 @end
 
 @implementation NHActivityViewController
@@ -63,6 +66,7 @@
         self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         self.items = items;
         self.applicationActivities = applicationActivities;
+        self.operationQueue = [[NSOperationQueue alloc] init];
     }
     return self;
 }
@@ -87,11 +91,19 @@
             if (placeholderItem != nil) {
                 [placeholderItems addObject:placeholderItem];
             }
+        } else if ([item isKindOfClass:[NHActivityItemProvider class]]) {
+            [placeholderItems addObject:[item placeholderItem]];
         } else {
             [placeholderItems addObject:item];
         }
     }
     return placeholderItems;
+}
+
+- (NSArray*)allItemProviders {
+    NSPredicate* predicate = [NSPredicate predicateWithFormat: @"self isKindOfClass: %@", [NHActivityItemProvider class]];
+    NSArray* providers = [self.items filteredArrayUsingPredicate:predicate];
+    return providers;
 }
 
 - (NSArray*)itemsForActivityType:(NSString*)activityType {
@@ -146,10 +158,28 @@
 - (void)performActivity:(NHActivity *)activity {
     __weak NHActivityViewController* weakSelf = self;
     [self dismissListViewControllerWithCompletion:^(BOOL finished) {
-        NSArray* items = [self itemsForActivityType:[activity activityType]];
-        [activity prepareWithActivityItems:items];
-        [weakSelf showActivity:activity];
+        NSArray* providers = [self allItemProviders];
+        if ([providers count] == 0) {
+            [weakSelf performActivityWithProvidedItems:activity];
+            return;
+        }
+        NSOperation* completionOperation = [[NSOperation alloc] init];
+        completionOperation.completionBlock = ^{
+            [weakSelf performActivityWithProvidedItems:activity];
+        };
+        for (NHActivityItemProvider* provider in providers) {
+            [provider setActivityType:[activity activityType]];
+            [completionOperation addDependency:provider];
+            [weakSelf.operationQueue addOperation:provider];
+        }
+        [weakSelf.operationQueue addOperation:completionOperation];
     }];
+}
+
+-(void)performActivityWithProvidedItems:(NHActivity *)activity {
+    NSArray* items = [self itemsForActivityType:[activity activityType]];
+    [activity prepareWithActivityItems:items];
+    [self showActivity:activity];
 }
 
 - (void)showActivity:(NHActivity*)activity {
