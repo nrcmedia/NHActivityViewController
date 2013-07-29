@@ -33,6 +33,7 @@ NSString* const NHActivityTypeMessage = @"Message";
 NSString* const NHActivityTypePrint = @"Print";
 NSString* const NHActivityTypeCopyToPasteboard = @"CopyToPasteboard";
 NSString* const NHActivityTypeSaveToCameraRoll = @"SaveToCameraRoll";
+NSString* const NHActivityTypeAssignToContact = @"AssignToContact";
 
 @implementation NHActivity
 

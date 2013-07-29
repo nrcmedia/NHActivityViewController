@@ -34,6 +34,7 @@ extern NSString* const NHActivityTypeMessage;
 extern NSString* const NHActivityTypePrint;
 extern NSString* const NHActivityTypeCopyToPasteboard;
 extern NSString* const NHActivityTypeSaveToCameraRoll;
+extern NSString* const NHActivityTypeAssignToContact;
 
 @interface NHActivity : NSObject
 
