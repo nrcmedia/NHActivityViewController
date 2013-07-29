@@ -96,14 +96,11 @@
         [mailComposeViewController setSubject:subject];
     }
 
-    if (self.text && !self.URL)
+    if ( self.text) {
         [mailComposeViewController setMessageBody:self.text isHTML:YES];
-
-    if (!self.text && self.URL && !isMailToURL)
+    } else if(!isMailToURL) {
         [mailComposeViewController setMessageBody:[self.URL absoluteString] isHTML:YES];
-    
-    if (self.text && self.URL && !isMailToURL)
-        [mailComposeViewController setMessageBody:[NSString stringWithFormat:@"%@ %@", self.text, [self.URL absoluteString]] isHTML:YES];
+    }
     
     if (self.image)
         [mailComposeViewController addAttachmentData:UIImagePNGRepresentation(self.image) mimeType:@"image/png" fileName:@"Image-1.png"];
