@@ -29,12 +29,13 @@
 
 extern NSString* const NHActivityTypePostToFacebook;
 extern NSString* const NHActivityTypePostToTwitter;
+extern NSString* const NHActivityTypePostToWeibo;
 extern NSString* const NHActivityTypeMail;
 extern NSString* const NHActivityTypeMessage;
 extern NSString* const NHActivityTypePrint;
 extern NSString* const NHActivityTypeCopyToPasteboard;
-extern NSString* const NHActivityTypeSaveToCameraRoll;
 extern NSString* const NHActivityTypeAssignToContact;
+extern NSString* const NHActivityTypeSaveToCameraRoll;
 
 @interface NHActivity : NSObject
 

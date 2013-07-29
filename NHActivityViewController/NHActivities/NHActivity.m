@@ -28,12 +28,13 @@
 
 NSString* const NHActivityTypePostToFacebook = @"PostToFacebook";
 NSString* const NHActivityTypePostToTwitter = @"PostToTwitter";
+NSString* const NHActivityTypePostToWeibo = @"PostToWeibo";
 NSString* const NHActivityTypeMail = @"Mail";
 NSString* const NHActivityTypeMessage = @"Message";
 NSString* const NHActivityTypePrint = @"Print";
 NSString* const NHActivityTypeCopyToPasteboard = @"CopyToPasteboard";
-NSString* const NHActivityTypeSaveToCameraRoll = @"SaveToCameraRoll";
 NSString* const NHActivityTypeAssignToContact = @"AssignToContact";
+NSString* const NHActivityTypeSaveToCameraRoll = @"SaveToCameraRoll";
 
 @implementation NHActivity
 

@@ -56,6 +56,7 @@
                                                , NHActivityTypePrint: UIActivityTypePrint
                                                , NHActivityTypeSaveToCameraRoll: UIActivityTypeSaveToCameraRoll
                                                , NHActivityTypeAssignToContact: UIActivityTypeAssignToContact
+                                               , NHActivityTypePostToWeibo: UIActivityTypePostToWeibo
                                              };
     
     for (NSString* activityType in activityTypes) {
