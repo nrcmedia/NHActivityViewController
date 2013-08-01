@@ -196,7 +196,11 @@
         }
     } else {
         [activity performActivity];
-        [self dismissViewControllerAnimated:NO completion:nil];
+        [self dismissViewControllerAnimated:NO completion:^{
+            if (self.completionHandler) {
+                self.completionHandler([activity activityType],YES);
+            }
+        }];
     }
 }
 
