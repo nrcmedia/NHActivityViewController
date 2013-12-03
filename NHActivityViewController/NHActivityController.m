@@ -48,16 +48,33 @@
 
 - (NSArray*)UIActivityTypesForNHActivityTypes:(NSArray*)activityTypes {
     NSMutableArray* UIActivityTypes = [NSMutableArray arrayWithCapacity:[activityTypes count]];
-    NSDictionary* activityTypeTranslation = @{   NHActivityTypeCopyToPasteboard:UIActivityTypeCopyToPasteboard
-                                               , NHActivityTypeMail:UIActivityTypeMail
-                                               , NHActivityTypeMessage: UIActivityTypeMessage
-                                               , NHActivityTypePostToFacebook: UIActivityTypePostToFacebook
-                                               , NHActivityTypePostToTwitter: UIActivityTypePostToTwitter
-                                               , NHActivityTypePrint: UIActivityTypePrint
-                                               , NHActivityTypeSaveToCameraRoll: UIActivityTypeSaveToCameraRoll
-                                               , NHActivityTypeAssignToContact: UIActivityTypeAssignToContact
-                                               , NHActivityTypePostToWeibo: UIActivityTypePostToWeibo
-                                             };
+    NSMutableDictionary* activityTypeTranslation =
+    [NSMutableDictionary dictionaryWithDictionary:@{ NHActivityTypeCopyToPasteboard:UIActivityTypeCopyToPasteboard
+                                                   , NHActivityTypeMail:UIActivityTypeMail
+                                                   , NHActivityTypeMessage: UIActivityTypeMessage
+                                                   , NHActivityTypePostToFacebook: UIActivityTypePostToFacebook
+                                                   , NHActivityTypePostToTwitter: UIActivityTypePostToTwitter
+                                                   , NHActivityTypePrint: UIActivityTypePrint
+                                                   , NHActivityTypeSaveToCameraRoll: UIActivityTypeSaveToCameraRoll
+                                                   , NHActivityTypeAssignToContact: UIActivityTypeAssignToContact
+                                                   , NHActivityTypePostToWeibo: UIActivityTypePostToWeibo
+                                                 }];
+    
+    if (&UIActivityTypeAddToReadingList != NULL) {
+        activityTypeTranslation[NHActivityTypeAddToReadingList] = UIActivityTypeAddToReadingList;
+    }
+    if (&UIActivityTypePostToFlickr != NULL) {
+        activityTypeTranslation[NHActivityTypePostToFlickr] = UIActivityTypePostToFlickr;
+    }
+    if (&UIActivityTypePostToVimeo != NULL) {
+        activityTypeTranslation[NHActivityTypePostToVimeo] = UIActivityTypePostToVimeo;
+    }
+    if (&UIActivityTypePostToTencentWeibo != NULL) {
+        activityTypeTranslation[NHActivityTypePostToTencentWeibo] = UIActivityTypePostToTencentWeibo;
+    }
+    if (&UIActivityTypeAirDrop != NULL) {
+        activityTypeTranslation[NHActivityTypeAirDrop] = UIActivityTypeAirDrop;
+    }
     
     for (NSString* activityType in activityTypes) {
         NSString* UIActivityType = activityTypeTranslation[activityType];

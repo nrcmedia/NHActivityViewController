@@ -35,6 +35,22 @@ NSString* const NHActivityTypePrint = @"Print";
 NSString* const NHActivityTypeCopyToPasteboard = @"CopyToPasteboard";
 NSString* const NHActivityTypeAssignToContact = @"AssignToContact";
 NSString* const NHActivityTypeSaveToCameraRoll = @"SaveToCameraRoll";
+NSString* const NHActivityTypeAddToReadingList = @"AddToReadingList";
+NSString *const NHActivityTypePostToFlickr = @"PostToFlickr";
+NSString *const NHActivityTypePostToVimeo = @"PostToVimeo";
+NSString *const NHActivityTypePostToTencentWeibo = @"PostToTencentWeibo";
+NSString *const NHActivityTypeAirDrop = @"AirDrop";
+
+
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED <= __IPHONE_6_1
+//Defined in iOS7
+NSString *const UIActivityTypeAddToReadingList = @"com.apple.UIKit.activity.AddToReadingList";
+NSString *const UIActivityTypePostToFlickr = @"com.apple.UIKit.activity.PostToFlickr";
+NSString *const UIActivityTypePostToVimeo = @"com.apple.UIKit.activity.PostToVimeo";
+NSString *const UIActivityTypePostToTencentWeibo = @"com.apple.UIKit.activity.TencentWeibo";
+NSString *const UIActivityTypeAirDrop = @"com.apple.UIKit.activity.AirDrop";
+#endif
 
 @implementation NHActivity
 

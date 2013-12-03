@@ -36,6 +36,21 @@ extern NSString* const NHActivityTypePrint;
 extern NSString* const NHActivityTypeCopyToPasteboard;
 extern NSString* const NHActivityTypeAssignToContact;
 extern NSString* const NHActivityTypeSaveToCameraRoll;
+extern NSString* const NHActivityTypeAddToReadingList;
+extern NSString *const NHActivityTypePostToFlickr;
+extern NSString *const NHActivityTypePostToVimeo;
+extern NSString *const NHActivityTypePostToTencentWeibo;
+extern NSString *const NHActivityTypeAirDrop;
+
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED <= __IPHONE_6_1
+//Defined in iOS7
+extern NSString *const UIActivityTypeAddToReadingList;
+extern NSString *const UIActivityTypePostToFlickr;
+extern NSString *const UIActivityTypePostToVimeo;
+extern NSString *const UIActivityTypePostToTencentWeibo;
+extern NSString *const UIActivityTypeAirDrop;
+#endif
 
 @interface NHActivity : NSObject
 
