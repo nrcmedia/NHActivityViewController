@@ -11,7 +11,7 @@
 @class XXItem;
 
 @interface NHActivityController : NSObject
-@property (nonatomic,copy) void (^onDismiss)();
+@property (nonatomic,copy) void (^onDismiss)(NSString*,BOOL);
 @property (nonatomic, copy) NSArray *excludedActivityTypes;
 - (id)initWithActivityItems:(NSArray*)items;
 - (void)presentFromBarButtonItem:(UIBarButtonItem *)barButtonItem ofViewController:(UIViewController*)viewController;

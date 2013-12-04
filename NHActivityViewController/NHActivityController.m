@@ -41,24 +41,23 @@
     activityVC.completionHandler = ^(NSString* activityType, BOOL completed) {
         weakSelf.sharePopover.delegate = nil;
         weakSelf.sharePopover = nil;
-        [weakSelf isDismissed];
+        [weakSelf isDismissedWithActivityType:activityType completed:completed];
     };
     return activityVC;
 }
 
-- (NSArray*)UIActivityTypesForNHActivityTypes:(NSArray*)activityTypes {
-    NSMutableArray* UIActivityTypes = [NSMutableArray arrayWithCapacity:[activityTypes count]];
+- (NSDictionary*)activityTypeTranslation {
     NSMutableDictionary* activityTypeTranslation =
     [NSMutableDictionary dictionaryWithDictionary:@{ NHActivityTypeCopyToPasteboard:UIActivityTypeCopyToPasteboard
-                                                   , NHActivityTypeMail:UIActivityTypeMail
-                                                   , NHActivityTypeMessage: UIActivityTypeMessage
-                                                   , NHActivityTypePostToFacebook: UIActivityTypePostToFacebook
-                                                   , NHActivityTypePostToTwitter: UIActivityTypePostToTwitter
-                                                   , NHActivityTypePrint: UIActivityTypePrint
-                                                   , NHActivityTypeSaveToCameraRoll: UIActivityTypeSaveToCameraRoll
-                                                   , NHActivityTypeAssignToContact: UIActivityTypeAssignToContact
-                                                   , NHActivityTypePostToWeibo: UIActivityTypePostToWeibo
-                                                 }];
+                                                     , NHActivityTypeMail:UIActivityTypeMail
+                                                     , NHActivityTypeMessage: UIActivityTypeMessage
+                                                     , NHActivityTypePostToFacebook: UIActivityTypePostToFacebook
+                                                     , NHActivityTypePostToTwitter: UIActivityTypePostToTwitter
+                                                     , NHActivityTypePrint: UIActivityTypePrint
+                                                     , NHActivityTypeSaveToCameraRoll: UIActivityTypeSaveToCameraRoll
+                                                     , NHActivityTypeAssignToContact: UIActivityTypeAssignToContact
+                                                     , NHActivityTypePostToWeibo: UIActivityTypePostToWeibo
+                                                     }];
     
     if (&UIActivityTypeAddToReadingList != NULL) {
         activityTypeTranslation[NHActivityTypeAddToReadingList] = UIActivityTypeAddToReadingList;
@@ -75,9 +74,14 @@
     if (&UIActivityTypeAirDrop != NULL) {
         activityTypeTranslation[NHActivityTypeAirDrop] = UIActivityTypeAirDrop;
     }
+    return activityTypeTranslation;
+}
+
+- (NSArray*)UIActivityTypesForNHActivityTypes:(NSArray*)activityTypes {
+    NSMutableArray* UIActivityTypes = [NSMutableArray arrayWithCapacity:[activityTypes count]];
     
     for (NSString* activityType in activityTypes) {
-        NSString* UIActivityType = activityTypeTranslation[activityType];
+        NSString* UIActivityType = self.activityTypeTranslation[activityType];
         if (UIActivityType != nil) {
             [UIActivityTypes addObject:UIActivityType];
         }
@@ -100,7 +104,10 @@
     activityVC.completionHandler = ^(NSString *activityType, BOOL completed) {
         weakSelf.sharePopover.delegate = nil;
         weakSelf.sharePopover = nil;
-        [weakSelf isDismissed];
+        NSDictionary* activityTypeTranslation = [weakSelf activityTypeTranslation];
+        NSDictionary* reversedActivityTypeTranslation = [NSDictionary dictionaryWithObjects:[activityTypeTranslation allKeys] forKeys:[activityTypeTranslation allValues]];
+        NSString* nhActivityType = reversedActivityTypeTranslation[activityType];
+        [weakSelf isDismissedWithActivityType:nhActivityType completed:completed];
     };
     activityVC.excludedActivityTypes = [self UIActivityTypesForNHActivityTypes:self.excludedActivityTypes];
     return activityVC;
@@ -118,19 +125,19 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         __weak NHActivityController* weakSelf = self;
         [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
-            [weakSelf isDismissed];
+            [weakSelf isDismissedWithActivityType:nil completed:NO];
         }];
         self.presentingViewController = nil;
     } else {
         [self.sharePopover dismissPopoverAnimated:YES];
-        [self isDismissed];
+        [self isDismissedWithActivityType:nil completed:NO];
         self.sharePopover = nil;
     }
 }
 
-- (void)isDismissed {
+- (void)isDismissedWithActivityType:(NSString*)activityType completed:(BOOL)completed {
     if (self.onDismiss) {
-        self.onDismiss();
+        self.onDismiss(activityType,completed);
     }
 }
 
@@ -161,7 +168,7 @@
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
     self.sharePopover.delegate = nil;
     self.sharePopover = nil;
-    [self isDismissed];
+    [self isDismissedWithActivityType:nil completed:NO];
 }
 
 @end
