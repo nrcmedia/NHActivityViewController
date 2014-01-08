@@ -158,23 +158,27 @@
 - (void)performActivity:(NHActivity *)activity {
     __weak NHActivityViewController* weakSelf = self;
     [self dismissListViewControllerWithCompletion:^(BOOL finished) {
-        NSArray* providers = [self allItemProviders];
+        NHActivityViewController* strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        NSArray* providers = [strongSelf allItemProviders];
         if ([providers count] == 0) {
-            [weakSelf performActivityWithProvidedItems:activity];
+            [strongSelf performActivityWithProvidedItems:activity];
             return;
         }
         NSOperation* completionOperation = [[NSOperation alloc] init];
         completionOperation.completionBlock = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf performActivityWithProvidedItems:activity];
+                [strongSelf performActivityWithProvidedItems:activity];
             });
         };
         for (NHActivityItemProvider* provider in providers) {
             [provider setActivityType:[activity activityType]];
             [completionOperation addDependency:provider];
-            [weakSelf.operationQueue addOperation:provider];
+            [strongSelf.operationQueue addOperation:provider];
         }
-        [weakSelf.operationQueue addOperation:completionOperation];
+        [strongSelf.operationQueue addOperation:completionOperation];
     }];
 }
 
@@ -212,8 +216,12 @@
         [self.listViewController willMoveToParentViewController:nil];
         __weak NHActivityViewController* weakSelf = self;
         [self.listViewController modalDismissAnimationWithCompletion:^(BOOL finished) {
-            [weakSelf.listViewController.view removeFromSuperview];
-            [weakSelf.listViewController removeFromParentViewController];
+            NHActivityViewController* strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            [strongSelf.listViewController.view removeFromSuperview];
+            [strongSelf.listViewController removeFromParentViewController];
             completion(finished);
         }];
     }
